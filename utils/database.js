@@ -1,6 +1,6 @@
-const Sequelize = require("sequelize");
+const { Sequelize } = require("sequelize");
 
-const sequelize = new Sequelize(
+module.exports = new Sequelize(
   process.env.DATABASE_NAME,
   process.env.DATABASE_USER_NAME,
   process.env.DATABASE_USER_PASSWORD,
@@ -9,5 +9,3 @@ const sequelize = new Sequelize(
     dialect: process.env.DATABASE_AGENT,
   }
 );
-
-module.exports = sequelize;

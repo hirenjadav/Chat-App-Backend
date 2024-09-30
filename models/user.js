@@ -1,19 +1,19 @@
-const { Sequelize, DataTypes } = require("sequelize");
-
-const sequelize = new Sequelize();
+const { DataTypes } = require("sequelize");
+const sequelize = require("../utils/database");
 
 const User = sequelize.define("user", {
   id: {
-    type: DataTypes.NUMBER,
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
     allowNull: false,
-    autoIncrement: true,
     primaryKey: true,
+    unique: true,
   },
-  first_name: {
+  firstName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  last_name: {
+  lastName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -21,13 +21,22 @@ const User = sequelize.define("user", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  phone_country_code: {
-    type: DataTypes.NUMBER,
+  phoneCountryCode: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
-  phone_number: {
-    type: DataTypes.NUMBER,
+  phoneNumber: {
+    type: DataTypes.INTEGER,
     allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
   },
 });
 
