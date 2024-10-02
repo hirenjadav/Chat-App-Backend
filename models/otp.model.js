@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../utils/database");
+const db = require("../config/database.config");
 
-const Conversation = sequelize.define("conversation", {
+const Otp = db.define("otp", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -9,10 +9,14 @@ const Conversation = sequelize.define("conversation", {
     primaryKey: true,
     unique: true,
   },
-  type: {
-    type: DataTypes.STRING,
+  value: {
+    type: DataTypes.BIGINT,
+    allowNull: false,
+  },
+  expireAt: {
+    type: DataTypes.DATE,
     allowNull: false,
   },
 });
 
-module.exports = Conversation;
+module.exports = Otp;

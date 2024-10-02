@@ -1,7 +1,21 @@
-const User = require("../models/user");
-const db = require("../utils/database");
+const User = require("../models/user.model");
+
+exports.fetchUsers = async (req, res, next) => {
+  console.log("\n\n===> fetchUsers req.query", req.query);
+
+  const filterOption = {};
+  if (req.query.userId) {
+    filterOption["id"] = req.query.userId;
+  }
+
+  const userList = await User.findAll({ where: filterOption });
+
+  res.status(200).json(userList);
+};
 
 exports.createUser = async (req, res, next) => {
+  console.log("\n\n===> createUser req.body", req.body);
+
   const {
     firstName,
     lastName,
@@ -21,18 +35,46 @@ exports.createUser = async (req, res, next) => {
   });
 
   await newUser.save();
+
+  res.status(200).send(newUser);
 };
 
-exports.findUser = async (req, res, next) => {
-  const user = await User.findAll({
-    where: {
-      id: req.body.id,
-    },
-  });
+exports.updateUser = async (req, res, next) => {
+  console.log("\n\n===> updateUser req.body", req.body);
+
+  const { firstName, lastName, email, phoneCountryCode, phoneNumber } =
+    req.body;
+
+  const user = await User.findOne({ where: { id: req.body.id } });
   console.log(user);
+
+  if (user != null) {
+    if (firstName) user.firstName = firstName;
+
+    if (lastName) user.lastName = lastName;
+
+    if (email) user.email = email;
+
+    if (phoneCountryCode) user.phoneCountryCode = phoneCountryCode;
+
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+
+    await user.save();
+
+    res.status(200).send(user);
+  } else {
+    res.status(200).send({});
+  }
 };
 
-exports.findAllUser = async (req, res, next) => {
-  const users = await User.findAll();
-  console.log(users.every((user) => user instanceof User));
+exports.deleteUser = async (req, res, next) => {
+  console.log("\n\n===> deleteUser req.query", req.query);
+
+  if (!req.query.userId) res.send({});
+
+  const user = User.destroy({
+    where: { id: req.query.userId },
+  });
+
+  res.status(200).send(req.query.userId);
 };

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../utils/database");
+const db = require("../config/database.config");
 
-const User = sequelize.define("user", {
+const User = db.define("user", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -20,14 +20,16 @@ const User = sequelize.define("user", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: true,
   },
   phoneCountryCode: {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
   phoneNumber: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.BIGINT,
     allowNull: false,
+    unique: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -38,6 +40,7 @@ const User = sequelize.define("user", {
     allowNull: false,
     defaultValue: false,
   },
+  deletedAt: DataTypes.DATE,
 });
 
 module.exports = User;

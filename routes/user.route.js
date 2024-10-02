@@ -3,10 +3,12 @@ const router = express.Router();
 
 const userController = require("../controllers/user.controller");
 
-router.get("/create", userController.createUser);
+router.post("/create", userController.createUser);
 
-router.put("/update", userController.createUser);
+router.put("/update", userController.updateUser);
 
-router.get("", userController.findAllUser);
+router.delete("/delete", userController.deleteUser);
+
+router.get("", userController.fetchUsers);
 
 module.exports = router;

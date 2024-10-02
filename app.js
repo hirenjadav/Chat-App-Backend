@@ -2,7 +2,7 @@ require("dotenv").config();
 const path = require("path");
 const bodyParser = require("body-parser");
 const express = require("express");
-const db = require("./utils/database");
+const db = require("./config/database.config");
 
 const userRoute = require("./routes/user.route");
 
@@ -16,11 +16,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/user", userRoute);
+app.use("/conv", userRoute);
+app.use("/participant", userRoute);
+app.use("/message", userRoute);
 
-const UserModel = require("./models/user");
-const ConversationModel = require("./models/conversation");
-const ParticipantModel = require("./models/participant");
-const MessageModel = require("./models/message");
+const models = require("./models/index");
 
 // Check database connection
 db.authenticate()
@@ -35,7 +35,7 @@ db.authenticate()
     console.error("Unable to connect to the database:", error);
   });
 
-db.sync()
+db.sync({ force: true })
   .then(() => {
     console.log("Database sync established successfully.");
   })

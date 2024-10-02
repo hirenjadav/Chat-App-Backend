@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../utils/database");
+const db = require("../config/database.config");
 
-const Message = sequelize.define("message", {
+const Message = db.define("message", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -9,27 +9,23 @@ const Message = sequelize.define("message", {
     primaryKey: true,
     unique: true,
   },
-  senderId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-  },
-  conversationId: {
-    type: DataTypes.UUID,
-    allowNull: false,
-  },
   messageType: {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  isMessageSent: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  isMessageViewed: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   message: DataTypes.STRING,
   messageAttachment: DataTypes.STRING,
   messageAttachmentType: DataTypes.STRING,
-  createdAt: {
-    type: DataTypes.DATE,
-    allowNull: false,
-    defaultValue: DataTypes.NOW,
-  },
-  updatedAt: DataTypes.DATE,
   deletedAt: DataTypes.DATE,
 });
 
