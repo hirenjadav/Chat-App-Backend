@@ -1,65 +1,34 @@
-const User = require("../models/user.model");
-const Otp = require("../models/otp.model");
+const errorHandler = require("../services/errorHandler.service");
+const responseHandler = require("../services/responseHandler.service");
+const ERROR_CODES = require("../constants/errorCodes.constant");
+const authRepository = require("../repository/auth.repo");
 
 exports.login = async (req, res, next) => {
   console.log("\n\n===> login req.body", req.body);
 
-  if (req.body?.number) {
-    const user = await User.findOne({
-      where: { phoneNumber: req.body.number },
-    });
-    console.log(user);
-
-    if (user != null) {
-      const otpValue = generateOtp();
-
-      Otp.build({
-        userId: user.id,
-        value: otpValue,
-        expireAt: new Date(),
-      });
-    }
-
-    res.send({});
-  } else {
-    res.send({});
+  if (!req.body.number) return errorHandler.throwBadRequestError(res);
+  try {
+    const data = await authRepository.login(req.body.number);
+    responseHandler.sendSuccessResponse(res, data);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
   }
 };
 
 exports.otpVerify = async (req, res, next) => {
   console.log("\n\n===> otpVerify req.body", req.body);
 
-  if (req.body?.number && req.body?.otp) {
-    const user = await User.findOne({
-      where: { phoneNumber: req.body.number },
-    });
-    console.log(user);
+  if (!req.body.number || !req.body.otp)
+    return errorHandler.throwBadRequestError(res);
 
-    if (user == null) res.status(200).send({});
-
-    const otpEntry = await Otp.findOne({
-      where: { userId: req.body.otp },
-    });
-
-    if (otpEntry == null) res.status(200).send({});
-
-    console.log(otpEntry);
-
-    res.send({});
-  } else {
-    res.send({});
+  try {
+    const data = await authRepository.otpVerify(req.body.number, req.body.otp);
+    responseHandler.sendSuccessResponse(res, data);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
   }
 };
 
 exports.logout = async (req, res, next) => {};
-
-const generateOtp = () => {
-  const otpLength = 6;
-  const digits = "0123456789";
-  const OTP = "";
-  const len = digits.length;
-  for (let i = 0; i < otpLength; i++) {
-    OTP += digits[Math.floor(Math.random() * len)];
-  }
-  return OTP;
-};

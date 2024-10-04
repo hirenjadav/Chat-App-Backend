@@ -7,6 +7,6 @@ router.post("/login", authController.login);
 
 router.post("/otpverify", authController.otpVerify);
 
-router.post("/logout", authController.log);
+router.post("/logout", authController.logout);
 
 module.exports = router;

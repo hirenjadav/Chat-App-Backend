@@ -1,79 +1,80 @@
-const Message = require("../models/message.model");
+const messageRespository = require("../repository/message.repo");
+const errorHandler = require("../services/errorHandler.service");
+const responseHandler = require("../services/responseHandler.service");
 
 exports.fetchMessages = async (req, res, next) => {
   console.log("\n\n===> fetchMessages req.query", req.query);
 
-  if (!req.query.userId || !req.query.conversationId) res.send({});
-  const filterOption = {
-    senderId: req.query.userId,
-    conversationId: req.query.conversationId,
-  };
+  if (!req.query.userId || !req.query.conversationId)
+    return errorHandler.throwBadRequestError(res);
 
-  if (req.query.messageId) {
-    filterOption["id"] = req.query.messageId;
+  try {
+    const filterOption = {
+      senderId: req.query.userId,
+      conversationId: req.query.conversationId,
+    };
+
+    if (req.query.messageId) {
+      filterOption["id"] = req.query.messageId;
+    }
+
+    const messageList = await messageRespository.fetchMessages(filterOption);
+
+    responseHandler.sendSuccessResponse(messageList);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
   }
-
-  const messageList = await Message.findAll({
-    where: filterOption,
-  });
-
-  res.status(200).json(messageList);
 };
 
 exports.createMessage = async (req, res, next) => {
   console.log("\n\n===> createMessage req.body", req.body);
 
-  if (!req.body.messageType) res.send({});
+  if (!req.body.messageType) return errorHandler.throwBadRequestError(res);
 
-  const messageData = { messageType: req.body.messageType };
-  if (req.body.message) messageData["message"] = req.body.message;
-  if (req.body.messageAttachment)
-    messageData["messageAttachment"] = req.body.messageAttachment;
-  if (req.body.messageAttachmentType)
-    messageData["messageAttachmentType"] = req.body.messageAttachmentType;
+  try {
+    const messageData = {};
+    messageData["messageType"] = req.body?.messageType;
+    messageData["message"] = req.body?.message;
+    messageData["messageAttachment"] = req.body?.messageAttachment;
+    messageData["messageAttachmentType"] = req.body?.messageAttachmentType;
 
-  const newMessage = Participant.build(messageData);
-  await newMessage.save();
+    const newMessage = await messageRespository.createMessage(messageData);
 
-  res.status(200).send(newParticipant);
+    responseHandler.sendSuccessResponse(res, newMessage);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
+  }
 };
 
 exports.updateMessage = async (req, res, next) => {
   console.log("\n\n===> updateMessage req.body", req.body);
 
-  if (!req.body.messageId) res.send({});
+  if (!req.body.messageId) return errorHandler.throwBadRequestError(res);
 
-  const message = Message.findOne({
-    where: {
-      id: req.body.messageId,
-    },
-  });
-
-  if (req.body.message) message["message"] = req.body.message;
-
-  if (req.body.messageAttachment)
-    message["messageAttachment"] = req.body.messageAttachment;
-
-  if (req.body.messageAttachmentType)
-    message["messageAttachmentType"] = req.body.messageAttachmentType;
-
-  if (req.body.isMessageSent) message["isMessageSent"] = req.body.isMessageSent;
-
-  if (req.body.isMessageViewed)
-    message["isMessageViewed"] = req.body.isMessageViewed;
-
-  if (req.body.deletedAt) message["deletedAt"] = req.body.deletedAt;
-
-  await message.save();
-
-  res.status(200).send(message);
+  try {
+    const updateMessage = await messageRespository.updateMessage(
+      req.body.messageId,
+      req.body
+    );
+    responseHandler.sendSuccessResponse(res, updateMessage);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError();
+  }
 };
 
 exports.deleteMessage = async (req, res, next) => {
   console.log("\n\n===> deleteMessage req.query", req.query);
 
-  req.query.deletedAt = new Date();
-  this.updateMessage(req, res, next);
+  if (!req.query.messageId) return errorHandler.throwBadRequestError(res);
 
-  res.status(200).send(req.query.messageId);
+  try {
+    const data = await messageRespository.deleteMessage(req.query.messageId);
+    responseHandler.sendSuccessResponse(res, data);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
+  }
 };

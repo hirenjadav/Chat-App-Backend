@@ -5,16 +5,19 @@ const express = require("express");
 const db = require("./config/database.config");
 
 const userRoute = require("./routes/user.route");
+const authRoute = require("./routes/auth.route");
 
 // Express Instance
 const app = express();
 
 // Parsing Body for Incoming Request
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Declare public folder as static folder
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/conv", userRoute);
 app.use("/participant", userRoute);
@@ -35,7 +38,7 @@ db.authenticate()
     console.error("Unable to connect to the database:", error);
   });
 
-db.sync({ force: true })
+db.sync()
   .then(() => {
     console.log("Database sync established successfully.");
   })

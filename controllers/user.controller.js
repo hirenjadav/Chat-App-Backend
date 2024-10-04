@@ -1,4 +1,6 @@
-const User = require("../models/user.model");
+const userRepository = require("../repository/user.repo");
+const errorHandler = require("../services/errorHandler.service");
+const responseHandler = require("../services/responseHandler.service");
 
 exports.fetchUsers = async (req, res, next) => {
   console.log("\n\n===> fetchUsers req.query", req.query);
@@ -7,74 +9,74 @@ exports.fetchUsers = async (req, res, next) => {
   if (req.query.userId) {
     filterOption["id"] = req.query.userId;
   }
+  const userList = await userRepository.fetchUsers(filterOption);
 
-  const userList = await User.findAll({ where: filterOption });
-
-  res.status(200).json(userList);
+  return responseHandler.sendSuccessResponse(res, userList);
 };
 
 exports.createUser = async (req, res, next) => {
   console.log("\n\n===> createUser req.body", req.body);
 
-  const {
-    firstName,
-    lastName,
-    email,
-    phoneCountryCode,
-    phoneNumber,
-    password,
-  } = req.body;
+  try {
+    if (
+      !req.body.firstName ||
+      !req.body.lastName ||
+      !req.body.email ||
+      !req.body.phoneCountryCode ||
+      !req.body.phoneNumber ||
+      !req.body.password
+    ) {
+      return errorHandler.throwBadRequestError(res);
+    }
 
-  const newUser = User.build({
-    firstName,
-    lastName,
-    email,
-    phoneCountryCode,
-    phoneNumber,
-    password,
-  });
+    const newUserData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phoneCountryCode: req.body.phoneCountryCode,
+      phoneNumber: req.body.phoneNumber,
+      password: req.body.password,
+    };
+    const newUser = await userRepository.createUser(newUserData);
 
-  await newUser.save();
-
-  res.status(200).send(newUser);
+    return responseHandler.sendSuccessResponse(res, newUser);
+  } catch (error) {
+    console.log(error);
+    return errorHandler.throwServerError(res);
+  }
 };
 
 exports.updateUser = async (req, res, next) => {
   console.log("\n\n===> updateUser req.body", req.body);
 
-  const { firstName, lastName, email, phoneCountryCode, phoneNumber } =
-    req.body;
+  if (!req.body.id) return errorHandler.throwBadRequestError(res);
 
-  const user = await User.findOne({ where: { id: req.body.id } });
-  console.log(user);
-
-  if (user != null) {
-    if (firstName) user.firstName = firstName;
-
-    if (lastName) user.lastName = lastName;
-
-    if (email) user.email = email;
-
-    if (phoneCountryCode) user.phoneCountryCode = phoneCountryCode;
-
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-
-    await user.save();
-
-    res.status(200).send(user);
-  } else {
-    res.status(200).send({});
+  try {
+    const updateUserData = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      phoneCountryCode: req.body.phoneCountryCode,
+      phoneNumber: req.body.phoneNumber,
+    };
+    const user = await userRepository.updateUser(req.body.id, updateUserData);
+    return responseHandler.sendSuccessResponse(res, user);
+  } catch (error) {
+    console.log(error);
+    return errorHandler.throwServerError(res);
   }
 };
 
 exports.deleteUser = async (req, res, next) => {
   console.log("\n\n===> deleteUser req.query", req.query);
 
-  if (!req.query.userId) res.send({});
+  if (!req.query.userId) return errorHandler.throwBadRequestError(res);
 
-  const user = User.destroy({
-    where: { id: req.query.userId },
-  });
-
-  res.status(200).send(req.query.userId);
+  try {
+    const data = await userRepository.deleteUser(req.query.userId);
+    responseHandler.sendSuccessResponse(res, data);
+  } catch (error) {
+    console.log(error);
+    errorHandler.throwServerError(res);
+  }
 };
