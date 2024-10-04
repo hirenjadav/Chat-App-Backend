@@ -3,9 +3,10 @@ const path = require("path");
 const bodyParser = require("body-parser");
 const express = require("express");
 const db = require("./config/database.config");
-
-const userRoute = require("./routes/user.route");
-const authRoute = require("./routes/auth.route");
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const models = require("./models/index");
+const socketConnection = require("./websocket/connection.ws");
 
 // Express Instance
 const app = express();
@@ -17,13 +18,22 @@ app.use(bodyParser.json());
 // Declare public folder as static folder
 app.use(express.static(path.join(__dirname, "public")));
 
+// Routes declaration
+const userRoute = require("./routes/user.route");
+const authRoute = require("./routes/auth.route");
+const conversationRoute = require("./routes/conversation.route");
+const messageRoute = require("./routes/message.route");
+const participantRoute = require("./routes/participant.route");
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
-app.use("/conv", userRoute);
-app.use("/participant", userRoute);
-app.use("/message", userRoute);
+app.use("/conv", conversationRoute);
+app.use("/participant", participantRoute);
+app.use("/message", messageRoute);
 
-const models = require("./models/index");
+// Web Socket Implementation.
+const httpServer = createServer(app);
+const io = new Server(httpServer);
+io.on("connection", socketConnection);
 
 // Check database connection
 db.authenticate()
