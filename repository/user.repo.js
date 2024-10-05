@@ -35,13 +35,13 @@ const createUser = async (data) => {
     });
 
     if (user != null) {
-      if (user.phoneNumber === phoneNumber)
+      if (user.phoneNumber == phoneNumber)
         throw new BaseError(
           HTTP_STATUS_CODE.OK,
           ERROR_CODES.USER_NUMBER_ALREADY_EXIST
         );
 
-      if (user.email === email)
+      if (user.email == email)
         throw new BaseError(
           HTTP_STATUS_CODE.OK,
           ERROR_CODES.USER_EMAIL_ALREADY_EXIST

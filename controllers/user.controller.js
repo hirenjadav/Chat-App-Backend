@@ -43,7 +43,7 @@ exports.createUser = async (req, res, next) => {
 
     return responseHandler.sendSuccessResponse(res, newUser);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -63,7 +63,7 @@ exports.updateUser = async (req, res, next) => {
     const user = await userRepository.updateUser(req.body.id, updateUserData);
     return responseHandler.sendSuccessResponse(res, user);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -76,6 +76,6 @@ exports.deleteUser = async (req, res, next) => {
     const data = await userRepository.deleteUser(req.query.userId);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };

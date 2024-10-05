@@ -22,7 +22,7 @@ exports.fetchMessages = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(messageList);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -42,7 +42,7 @@ exports.createMessage = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, newMessage);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -72,6 +72,6 @@ exports.deleteMessage = async (req, res, next) => {
     const data = await messageRespository.deleteMessage(req.query.messageId);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };

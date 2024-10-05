@@ -32,8 +32,8 @@ app.use("/participant", participantRoute);
 app.use("/message", messageRoute);
 
 app.use(async (err, req, res, next) => {
-  console.log("+++++++++", err);
-  if (!errorHandler.isTrustedError(err)) next(err);
+  if (!errorHandler.isTrustedError(err))
+    return errorHandler.handleApiError(err, res);
   return errorHandler.handleError(err, res);
 });
 

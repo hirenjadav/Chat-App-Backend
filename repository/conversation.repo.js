@@ -2,36 +2,49 @@ const Conversation = require("../models/conversation.model");
 const participantRespository = require("./participant.repo");
 
 const fetchConversations = async (filterOption) => {
-  return new Promise(async (resolve) => {
+  try {
     const conversationList = await User.findAll({ where: filterOption });
-    resolve(conversationList);
-  });
+    return conversationList; // Return the fetched conversations
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const createConversation = async (userId, conversationType, participantIds) => {
-  return new Promise(async (resolve) => {
-    const newConversation = Conversation.build({
+  try {
+    const newConversation = await Conversation.create({
       creatorId: userId,
       type: conversationType,
     });
-    await newConversation.save();
-    participantRespository.createBulkParticipants(
+
+    // Add participants in bulk
+    await participantRespository.createBulkParticipants(
       newConversation.id,
       participantIds
     );
-  });
+
+    return newConversation; // Return the newly created conversation
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const deleteConversation = async (userId, conversationId) => {
-  return new Promise(async (resolve) => {
-    const conversation = Conversation.destroy({
+  try {
+    const conversation = await Conversation.destroy({
       where: {
         creatorId: userId,
         id: conversationId,
       },
     });
-    resolve(conversation.id);
-  });
+
+    return conversationId; // Return the conversation ID for confirmation
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const conversationRespository = {

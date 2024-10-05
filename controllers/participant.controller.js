@@ -30,7 +30,7 @@ exports.createParticipant = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, newParticipant);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -48,7 +48,7 @@ exports.createBulkParticipants = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, newParticipants);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -64,7 +64,7 @@ exports.updateParticipant = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, participant);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -79,6 +79,6 @@ exports.deleteParticipant = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };

@@ -24,7 +24,7 @@ exports.fetchConversations = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, conversationList);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -47,7 +47,7 @@ exports.createConversation = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, newConversation);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -63,6 +63,6 @@ exports.deleteConversation = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };

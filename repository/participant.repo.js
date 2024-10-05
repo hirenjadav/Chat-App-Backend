@@ -1,61 +1,88 @@
+const ERROR_CODES = require("../constants/errorCodes.constant");
+const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 const Participant = require("../models/participant.model");
+const BaseError = require("../utils/BaseError");
 
 const fetchParticipants = async (conversationId) => {
-  return new Promise(async (resolve) => {
+  try {
     const participantList = await Participant.findAll({
       where: { conversationId },
     });
-    resolve(participantList);
-  });
+
+    return participantList; // Return the list of participants
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const createParticipant = async (userId, userType, conversationId) => {
-  return new Promise(async (resolve) => {
-    const newParticipant = Participant.build({
+  try {
+    const newParticipant = await Participant.create({
       userId,
       userType,
       conversationId,
     });
-    await newParticipant.save();
-    resolve(newParticipant);
-  });
+
+    return newParticipant; // Return the newly created participant
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const createBulkParticipants = async (conversationId, participantIds) => {
-  return new Promise(async (resolve) => {
-    const participantList = participantIds.map((x) => {
-      return {
-        userId: x,
-        userType: "userType",
-        conversationId: conversationId,
-      };
-    });
-    const newParticipants = Participant.bulkBuild(participantList);
-    await newParticipants.save();
-    resolve(newParticipants);
-  });
+  try {
+    const participantList = participantIds.map((userId) => ({
+      userId,
+      userType: "userType", // You might want to replace "userType" with the actual user type
+      conversationId,
+    }));
+
+    // Use bulkCreate instead of bulkBuild and save
+    const newParticipants = await Participant.bulkCreate(participantList);
+
+    return newParticipants; // Return the newly created participants
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const updateParticipant = async (participantId, userType) => {
-  return new Promise(async (resolve) => {
-    const participant = Participant.findOne({
+  try {
+    const participant = await Participant.findOne({
       where: { id: participantId },
     });
-    participant.userType = userType;
+
+    if (!participant) {
+      throw new BaseError(
+        HTTP_STATUS_CODE.OK,
+        ERROR_CODES.PARTICIPANT_NOT_FOUND
+      );
+    }
+
+    participant.userType = userType; // Update user type
     await participant.save();
-    resolve(participant);
-  });
+
+    return participant; // Return the updated participant
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const deleteParticipant = async (participantId) => {
-  return new Promise(async (resolve) => {
-    const participant = await Participant.destroy({
-      where: {
-        id: participantId,
-      },
+  try {
+    const result = await Participant.destroy({
+      where: { id: participantId },
     });
-    resolve(participant.id);
-  });
+
+    return participantId; // Return the participant ID for confirmation
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const participantRespository = {

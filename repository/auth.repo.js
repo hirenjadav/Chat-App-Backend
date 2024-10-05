@@ -5,48 +5,50 @@ const BaseError = require("../utils/BaseError");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 
 const login = async (phoneNumber) => {
-  return new Promise(async (resolve) => {
-    const user = await User.findOne({
-      where: { phoneNumber },
-    });
+  try {
+    const user = await User.findOne({ where: { phoneNumber } });
 
-    if (user == null)
+    if (!user) {
       throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
+    }
 
     const otpValue = generateOtp();
 
-    Otp.build({
+    await Otp.create({
       userId: user.id,
       value: otpValue,
-      expireAt: new Date(),
+      expireAt: new Date(), // Set the expiration time appropriately
     });
 
-    resolve(null);
-  });
+    return null; // You might want to return something like a success message or the OTP for testing
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const otpVerify = async (phoneNumber, otp) => {
-  return new Promise(async (resolve) => {
-    const user = await User.findOne({
-      where: { phoneNumber },
-    });
+  try {
+    const user = await User.findOne({ where: { phoneNumber } });
 
-    if (user == null)
+    if (!user)
       throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
 
-    const otpEntry = await Otp.findOne({
-      where: { userId: user.id },
-    });
+    const otpEntry = await Otp.findOne({ where: { userId: user.id } });
 
-    if (otpEntry == null)
+    if (!otpEntry)
       throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.OTP_NOT_FOUND);
 
-    if (otpEntry.value === otp) {
-      resolve(user);
+    // Verify the OTP
+    if (otpEntry.value == otp) {
+      return user; // Return the user if OTP matches
     } else {
-      resolve(null);
+      return null; // Return null if OTP doesn't match
     }
-  });
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const logout = async () => {};

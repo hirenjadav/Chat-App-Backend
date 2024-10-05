@@ -13,7 +13,7 @@ exports.login = async (req, res, next) => {
     const data = await authRepository.login(req.body.number);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
@@ -26,7 +26,7 @@ exports.otpVerify = async (req, res, next) => {
     const data = await authRepository.otpVerify(req.body.number, req.body.otp);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    throw new APIError();
+    next(error);
   }
 };
 
