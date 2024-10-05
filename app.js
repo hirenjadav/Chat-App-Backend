@@ -32,7 +32,11 @@ app.use("/message", messageRoute);
 
 // Web Socket Implementation.
 const httpServer = createServer(app);
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: process.env.FRONTEND_DOMAIN || "http://localhost:5173",
+  },
+});
 io.on("connection", socketConnection);
 
 // Check database connection
@@ -40,9 +44,15 @@ db.authenticate()
   .then(() => {
     console.log("Connection has been established successfully.");
 
-    const port = process.env.PORT || 4000;
-    app.listen(port);
-    console.log("Server listening on port " + port + ".");
+    const serverPort = process.env.PORT || 3000;
+    app.listen(serverPort);
+    console.log("Server listening on port " + serverPort + ".");
+
+    const webSocketServerPort = process.env.WEB_SOCKET_PORT || 4000;
+    io.listen(webSocketServerPort);
+    console.log(
+      "Web Socket Server listening on port " + webSocketServerPort + "."
+    );
   })
   .catch((error) => {
     console.error("Unable to connect to the database:", error);
