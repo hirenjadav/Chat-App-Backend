@@ -1,11 +1,13 @@
 const errorHandler = require("../services/errorHandler.service");
 const responseHandler = require("../services/responseHandler.service");
 const conversationRespository = require("../repository/conversation.repo");
+const APIError = require("../utils/ApiError");
+const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchConversations = async (req, res, next) => {
   console.log("\n\n===> fetchConversations req.query", req.query);
 
-  if (!req.query.userId) return errorHandler.throwBadRequestError(res);
+  if (!req.query.userId) throw new HTTP400Error();
 
   try {
     const filterOption = {
@@ -22,8 +24,7 @@ exports.fetchConversations = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, conversationList);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
@@ -35,7 +36,7 @@ exports.createConversation = async (req, res, next) => {
     !req.body.conversationType ||
     !req.body.participantIds
   )
-    return errorHandler.throwBadRequestError(res);
+    throw new HTTP400Error();
 
   try {
     const newConversation = await conversationRespository.createConversation(
@@ -46,16 +47,14 @@ exports.createConversation = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, newConversation);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
 exports.deleteConversation = async (req, res, next) => {
   console.log("\n\n===> deleteConversation req.query", req.query);
 
-  if (!req.query.userId || !req.query.conversationId)
-    return errorHandler.throwBadRequestError(res);
+  if (!req.query.userId || !req.query.conversationId) throw new HTTP400Error();
 
   try {
     const data = await conversationRespository.deleteConversation(
@@ -64,7 +63,6 @@ exports.deleteConversation = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };

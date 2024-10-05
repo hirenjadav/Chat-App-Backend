@@ -1,6 +1,8 @@
 const User = require("../models/user.model");
 const Otp = require("../models/otp.model");
 const ERROR_CODES = require("../constants/errorCodes.constant");
+const BaseError = require("../utils/BaseError");
+const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 
 const login = async (phoneNumber) => {
   return new Promise(async (resolve) => {
@@ -8,12 +10,8 @@ const login = async (phoneNumber) => {
       where: { phoneNumber },
     });
 
-    if (user == null) {
-      // return responseHandler.sendFailureResponse(
-      //   res,
-      //   ERROR_CODES.USER_NOT_FOUND
-      // );
-    }
+    if (user == null)
+      throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
 
     const otpValue = generateOtp();
 
@@ -33,23 +31,15 @@ const otpVerify = async (phoneNumber, otp) => {
       where: { phoneNumber },
     });
 
-    if (user == null) {
-      // return responseHandler.sendFailureResponse(
-      //   res,
-      //   ERROR_CODES.USER_NOT_FOUND
-      // );
-    }
+    if (user == null)
+      throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
 
     const otpEntry = await Otp.findOne({
       where: { userId: user.id },
     });
 
-    if (otpEntry == null) {
-      // return responseHandler.sendFailureResponse(
-      //   res,
-      //   ERROR_CODES.OTP_NOT_FOUND
-      // );
-    }
+    if (otpEntry == null)
+      throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.OTP_NOT_FOUND);
 
     if (otpEntry.value === otp) {
       resolve(user);

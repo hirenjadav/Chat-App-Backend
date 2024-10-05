@@ -24,11 +24,18 @@ const authRoute = require("./routes/auth.route");
 const conversationRoute = require("./routes/conversation.route");
 const messageRoute = require("./routes/message.route");
 const participantRoute = require("./routes/participant.route");
+const errorHandler = require("./utils/ErrorHandler");
 app.use("/auth", authRoute);
 app.use("/user", userRoute);
 app.use("/conv", conversationRoute);
 app.use("/participant", participantRoute);
 app.use("/message", messageRoute);
+
+app.use(async (err, req, res, next) => {
+  console.log("+++++++++", err);
+  if (!errorHandler.isTrustedError(err)) next(err);
+  return errorHandler.handleError(err, res);
+});
 
 // Web Socket Implementation.
 const httpServer = createServer(app);

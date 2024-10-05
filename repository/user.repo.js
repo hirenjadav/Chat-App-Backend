@@ -1,25 +1,53 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
+const { Op } = require("sequelize");
+const ERROR_CODES = require("../constants/errorCodes.constant");
+const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
+const BaseError = require("../utils/BaseError");
 
 const passwordEncrytSalt = 10;
 
 const fetchUsers = async (filterOption = {}) => {
-  return new Promise(async (resolve) => {
+  try {
     const userList = await User.findAll({ where: filterOption });
-    resolve(userList);
-  });
+    return userList;
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const createUser = async (data) => {
-  return new Promise(async (resolve) => {
-    const {
-      firstName,
-      lastName,
-      email,
-      phoneCountryCode,
-      phoneNumber,
-      password,
-    } = data;
+  const {
+    firstName,
+    lastName,
+    email,
+    phoneCountryCode,
+    phoneNumber,
+    password,
+  } = data;
+
+  try {
+    const user = await User.findOne({
+      where: {
+        [Op.or]: [{ phoneNumber }, { email }],
+      },
+    });
+
+    if (user != null) {
+      if (user.phoneNumber === phoneNumber)
+        throw new BaseError(
+          HTTP_STATUS_CODE.OK,
+          ERROR_CODES.USER_NUMBER_ALREADY_EXIST
+        );
+
+      if (user.email === email)
+        throw new BaseError(
+          HTTP_STATUS_CODE.OK,
+          ERROR_CODES.USER_EMAIL_ALREADY_EXIST
+        );
+    }
+
     const hashedPassword = await bcrypt.hash(password, passwordEncrytSalt);
     const newUser = User.build({
       firstName,
@@ -30,41 +58,49 @@ const createUser = async (data) => {
       password: hashedPassword,
     });
     await newUser.save();
-    const mappedUser = mapUserDetails(newUser);
-    resolve(mappedUser);
-  });
+
+    return mapUserDetails(newUser);
+  } catch (error) {
+    // Error handling here (e.g., logging or passing it to middleware)
+    throw error;
+  }
 };
 
 const updateUser = async (userId, data) => {
-  return new Promise(async (resolve) => {
-    const { firstName, lastName, email, phoneCountryCode, phoneNumber } = data;
+  const { firstName, lastName, email, phoneCountryCode, phoneNumber } = data;
 
+  try {
     const user = await User.findOne({ where: { id: userId } });
 
-    if (user == null) {
-      // return responseHandler.sendFailureResponse(
-      //   res,
-      //   ERROR_CODES.USER_NOT_FOUND
-      // );
-    }
+    if (user == null)
+      throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
 
+    // Update fields if provided
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
     if (email) user.email = email;
     if (phoneCountryCode) user.phoneCountryCode = phoneCountryCode;
     if (phoneNumber) user.phoneNumber = phoneNumber;
 
+    // Save the updated user
     await user.save();
-    const mappedUser = mapUserDetails(user);
-    resolve(mappedUser);
-  });
+
+    // Return the mapped user details
+    return mapUserDetails(user);
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const deleteUser = async (userId) => {
-  return new Promise(async (resolve) => {
+  try {
     await User.destroy({ where: { id: userId } });
-    resolve(userId);
-  });
+    return userId; // Return the userId to indicate successful deletion
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
 };
 
 const mapUserDetails = (data) => {

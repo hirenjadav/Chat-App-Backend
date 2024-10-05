@@ -1,16 +1,20 @@
-export class BaseError extends Error {
-  name;
+class BaseError extends Error {
   httpCode;
+  errorCode;
+  errorData;
   isOperational;
 
-  constructor(name, httpCode, description, isOperational) {
-    super(description);
+  constructor(httpCode, errorCode, isOperational = true, errorData = null) {
+    super();
     Object.setPrototypeOf(this, new.target.prototype);
 
-    this.name = name;
     this.httpCode = httpCode;
+    this.errorCode = errorCode;
+    this.errorData = errorData;
     this.isOperational = isOperational;
 
     Error.captureStackTrace(this);
   }
 }
+
+module.exports = BaseError;

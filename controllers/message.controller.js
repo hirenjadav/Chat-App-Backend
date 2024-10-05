@@ -1,12 +1,12 @@
 const messageRespository = require("../repository/message.repo");
 const errorHandler = require("../services/errorHandler.service");
 const responseHandler = require("../services/responseHandler.service");
+const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchMessages = async (req, res, next) => {
   console.log("\n\n===> fetchMessages req.query", req.query);
 
-  if (!req.query.userId || !req.query.conversationId)
-    return errorHandler.throwBadRequestError(res);
+  if (!req.query.userId || !req.query.conversationId) throw new HTTP400Error();
 
   try {
     const filterOption = {
@@ -22,15 +22,14 @@ exports.fetchMessages = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(messageList);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
 exports.createMessage = async (req, res, next) => {
   console.log("\n\n===> createMessage req.body", req.body);
 
-  if (!req.body.messageType) return errorHandler.throwBadRequestError(res);
+  if (!req.body.messageType) throw new HTTP400Error();
 
   try {
     const messageData = {};
@@ -43,15 +42,14 @@ exports.createMessage = async (req, res, next) => {
 
     responseHandler.sendSuccessResponse(res, newMessage);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
 exports.updateMessage = async (req, res, next) => {
   console.log("\n\n===> updateMessage req.body", req.body);
 
-  if (!req.body.messageId) return errorHandler.throwBadRequestError(res);
+  if (!req.body.messageId) throw new HTTP400Error();
 
   try {
     const updateMessage = await messageRespository.updateMessage(
@@ -68,13 +66,12 @@ exports.updateMessage = async (req, res, next) => {
 exports.deleteMessage = async (req, res, next) => {
   console.log("\n\n===> deleteMessage req.query", req.query);
 
-  if (!req.query.messageId) return errorHandler.throwBadRequestError(res);
+  if (!req.query.messageId) throw new HTTP400Error();
 
   try {
     const data = await messageRespository.deleteMessage(req.query.messageId);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };

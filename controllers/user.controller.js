@@ -1,6 +1,8 @@
 const userRepository = require("../repository/user.repo");
 const errorHandler = require("../services/errorHandler.service");
 const responseHandler = require("../services/responseHandler.service");
+const APIError = require("../utils/ApiError");
+const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchUsers = async (req, res, next) => {
   console.log("\n\n===> fetchUsers req.query", req.query);
@@ -26,7 +28,7 @@ exports.createUser = async (req, res, next) => {
       !req.body.phoneNumber ||
       !req.body.password
     ) {
-      return errorHandler.throwBadRequestError(res);
+      throw new HTTP400Error();
     }
 
     const newUserData = {
@@ -41,15 +43,14 @@ exports.createUser = async (req, res, next) => {
 
     return responseHandler.sendSuccessResponse(res, newUser);
   } catch (error) {
-    console.log(error);
-    return errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
 exports.updateUser = async (req, res, next) => {
   console.log("\n\n===> updateUser req.body", req.body);
 
-  if (!req.body.id) return errorHandler.throwBadRequestError(res);
+  if (!req.body.id) throw new HTTP400Error();
 
   try {
     const updateUserData = {
@@ -62,21 +63,19 @@ exports.updateUser = async (req, res, next) => {
     const user = await userRepository.updateUser(req.body.id, updateUserData);
     return responseHandler.sendSuccessResponse(res, user);
   } catch (error) {
-    console.log(error);
-    return errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };
 
 exports.deleteUser = async (req, res, next) => {
   console.log("\n\n===> deleteUser req.query", req.query);
 
-  if (!req.query.userId) return errorHandler.throwBadRequestError(res);
+  if (!req.query.userId) throw new HTTP400Error();
 
   try {
     const data = await userRepository.deleteUser(req.query.userId);
     responseHandler.sendSuccessResponse(res, data);
   } catch (error) {
-    console.log(error);
-    errorHandler.throwServerError(res);
+    throw new APIError();
   }
 };

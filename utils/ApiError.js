@@ -2,10 +2,10 @@ const ERROR_CODES = require("../constants/errorCodes.constant");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 const BaseError = require("./BaseError");
 
-class HTTP400Error extends BaseError {
+class APIError extends BaseError {
   constructor() {
-    super(HTTP_STATUS_CODE.BAD_REQUEST, ERROR_CODES.BAD_REQUEST, true);
+    super(HTTP_STATUS_CODE.INTERNAL_SERVER, ERROR_CODES.INTERNAL_SERVER, true);
   }
 }
 
-module.exports = HTTP400Error;
+module.exports = APIError;
