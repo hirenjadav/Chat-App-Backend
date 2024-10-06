@@ -7,6 +7,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const models = require("./models/index");
 const socketConnection = require("./websocket/connection.ws");
+const verfiyUserToken = require("./middlewares/userAuth.middleware");
 
 // Express Instance
 const app = express();
@@ -26,10 +27,10 @@ const messageRoute = require("./routes/message.route");
 const participantRoute = require("./routes/participant.route");
 const errorHandler = require("./utils/ErrorHandler");
 app.use("/auth", authRoute);
-app.use("/user", userRoute);
-app.use("/conv", conversationRoute);
-app.use("/participant", participantRoute);
-app.use("/message", messageRoute);
+app.use("/user", verfiyUserToken, userRoute);
+app.use("/conv", verfiyUserToken, conversationRoute);
+app.use("/participant", verfiyUserToken, participantRoute);
+app.use("/message", verfiyUserToken, messageRoute);
 
 app.use(async (err, req, res, next) => {
   if (!errorHandler.isTrustedError(err))
@@ -65,7 +66,7 @@ db.authenticate()
     console.error("Unable to connect to the database:", error);
   });
 
-db.sync()
+db.sync({ alter: true })
   .then(() => {
     console.log("Database sync established successfully.");
   })

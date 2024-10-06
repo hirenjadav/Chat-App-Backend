@@ -12,15 +12,15 @@ const login = async (phoneNumber) => {
       throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
     }
 
-    const otpValue = generateOtp();
-
-    await Otp.create({
-      userId: user.id,
-      value: otpValue,
-      expireAt: new Date(), // Set the expiration time appropriately
+    const [userOtp, isCreated] = await Otp.findOrCreate({
+      where: { userId: user.id },
     });
 
-    return null; // You might want to return something like a success message or the OTP for testing
+    userOtp.value = generateOtp();
+    userOtp.expireAt = new Date();
+    await userOtp.save();
+
+    return null;
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;
@@ -39,14 +39,9 @@ const otpVerify = async (phoneNumber, otp) => {
     if (!otpEntry)
       throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.OTP_NOT_FOUND);
 
-    // Verify the OTP
-    if (otpEntry.value == otp) {
-      return user; // Return the user if OTP matches
-    } else {
-      return null; // Return null if OTP doesn't match
-    }
+    if (otpEntry.value == otp) return user;
+    else throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.OTP_INVALID);
   } catch (error) {
-    // Handle or log the error, then re-throw it if necessary
     throw error;
   }
 };
