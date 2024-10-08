@@ -4,7 +4,7 @@ const ERROR_CODES = require("../constants/errorCodes.constant");
 const BaseError = require("../utils/BaseError");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 
-const login = async (phoneNumber) => {
+const loginWithOtp = async (phoneNumber) => {
   try {
     const user = await User.findOne({ where: { phoneNumber } });
 
@@ -60,7 +60,7 @@ const generateOtp = () => {
 };
 
 const authRepository = {
-  login,
+  loginWithOtp,
   logout,
   otpVerify,
 };

@@ -103,6 +103,27 @@ const deleteUser = async (userId) => {
   }
 };
 
+const passwordVerify = async (email, password) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user)
+      throw new BaseError(HTTP_STATUS_CODE.OK, ERROR_CODES.USER_NOT_FOUND);
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch)
+      throw new BaseError(
+        HTTP_STATUS_CODE.OK,
+        ERROR_CODES.USER_PASSWORD_INVALID
+      );
+
+    return mapUserDetails(user);
+  } catch (error) {
+    throw error;
+  }
+};
+
 const mapUserDetails = (data) => {
   return {
     id: data["id"],
@@ -120,6 +141,7 @@ const userRepository = {
   createUser,
   updateUser,
   deleteUser,
+  passwordVerify,
 };
 
 module.exports = userRepository;

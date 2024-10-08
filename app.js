@@ -8,9 +8,12 @@ const { Server } = require("socket.io");
 const models = require("./models/index");
 const socketConnection = require("./websocket/connection.ws");
 const verfiyUserToken = require("./middlewares/userAuth.middleware");
+const cors = require("cors");
 
 // Express Instance
 const app = express();
+
+app.use(cors());
 
 // Parsing Body for Incoming Request
 app.use(bodyParser.urlencoded({ extended: false }));
