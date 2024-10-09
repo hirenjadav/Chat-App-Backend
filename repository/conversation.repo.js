@@ -3,7 +3,9 @@ const participantRespository = require("./participant.repo");
 
 const fetchConversations = async (filterOption) => {
   try {
-    const conversationList = await User.findAll({ where: filterOption });
+    const conversationList = await Conversation.findAll({
+      where: filterOption,
+    });
     return conversationList; // Return the fetched conversations
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary

@@ -3,10 +3,10 @@ const router = express.Router();
 
 const conversationController = require("../controllers/conversation.controller");
 
+router.get("", conversationController.fetchConversations);
+
 router.post("/create", conversationController.createConversation);
 
 router.delete("/delete", conversationController.deleteConversation);
-
-router.get("", conversationController.fetchConversations);
 
 module.exports = router;
