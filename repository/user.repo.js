@@ -10,7 +10,7 @@ const passwordEncrytSalt = 10;
 const fetchUsers = async (filterOption = {}) => {
   try {
     const userList = await User.findAll({ where: filterOption });
-    return userList;
+    return userList.map((x) => mapUserDetails(x));
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;

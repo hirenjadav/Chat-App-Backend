@@ -28,12 +28,14 @@ const authRoute = require("./routes/auth.route");
 const conversationRoute = require("./routes/conversation.route");
 const messageRoute = require("./routes/message.route");
 const participantRoute = require("./routes/participant.route");
+const friendRoute = require("./routes/friend.route");
 const errorHandler = require("./utils/ErrorHandler");
 app.use("/auth", authRoute);
 app.use("/user", verfiyUserToken, userRoute);
 app.use("/conv", verfiyUserToken, conversationRoute);
 app.use("/participant", verfiyUserToken, participantRoute);
 app.use("/message", verfiyUserToken, messageRoute);
+app.use("/friend", verfiyUserToken, friendRoute);
 
 app.use(async (err, req, res, next) => {
   if (!errorHandler.isTrustedError(err))

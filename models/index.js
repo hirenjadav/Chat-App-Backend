@@ -48,18 +48,6 @@ UserModel.hasOne(FriendModel, {
 });
 
 UserModel.hasOne(FriendModel, {
-  foreignKey: "userId1",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-UserModel.hasOne(FriendModel, {
-  foreignKey: "userId2",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-UserModel.hasOne(FriendModel, {
   foreignKey: "userId2",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
