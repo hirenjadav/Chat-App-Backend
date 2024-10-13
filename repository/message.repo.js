@@ -5,7 +5,10 @@ const BaseError = require("../utils/BaseError");
 
 const fetchMessages = async (filterOption) => {
   try {
-    const messageList = await Message.findAll({ where: filterOption });
+    const messageList = await Message.findAll({
+      where: filterOption,
+      order: [["updatedAt", "ASC"]],
+    });
     return messageList; // Return the fetched messages
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
