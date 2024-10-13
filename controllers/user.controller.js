@@ -8,8 +8,11 @@ exports.fetchUsers = async (req, res, next) => {
   console.log("\n\n===> fetchUsers req.query", req.query);
 
   const filterOption = {};
-  if (req.query.userId) {
-    filterOption["id"] = req.query.userId;
+  // if (req.query.userId) {
+  //   filterOption["id"] = req.query.userId;
+  // }
+  if (req.query.search) {
+    filterOption["search"] = req.query.search;
   }
   const userList = await userRepository.fetchUsers(filterOption);
 

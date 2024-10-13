@@ -13,6 +13,7 @@ const Conversation = db.define("conversation", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  name: DataTypes.STRING,
 });
 
 module.exports = Conversation;

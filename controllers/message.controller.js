@@ -20,7 +20,7 @@ exports.fetchMessages = async (req, res, next) => {
 
     const messageList = await messageRespository.fetchMessages(filterOption);
 
-    responseHandler.sendSuccessResponse(messageList);
+    responseHandler.sendSuccessResponse(res, messageList);
   } catch (error) {
     next(error);
   }
@@ -29,10 +29,13 @@ exports.fetchMessages = async (req, res, next) => {
 exports.createMessage = async (req, res, next) => {
   console.log("\n\n===> createMessage req.body", req.body);
 
-  if (!req.body.messageType) throw new HTTP400Error();
+  if (!req.body.conversationId || !req.body.messageType)
+    throw new HTTP400Error();
 
   try {
     const messageData = {};
+    messageData["senderId"] = req.query.userId;
+    messageData["conversationId"] = req.body?.conversationId;
     messageData["messageType"] = req.body?.messageType;
     messageData["message"] = req.body?.message;
     messageData["messageAttachment"] = req.body?.messageAttachment;

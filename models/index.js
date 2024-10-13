@@ -5,8 +5,14 @@ const MessageModel = require("./message.model");
 const OtpModel = require("./otp.model");
 const FriendModel = require("./friend.model");
 
-ConversationModel.hasOne(MessageModel, {
+ConversationModel.hasMany(MessageModel, {
   foreignKey: "conversationId",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+UserModel.hasMany(MessageModel, {
+  foreignKey: "senderId",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
@@ -17,22 +23,24 @@ UserModel.hasOne(ConversationModel, {
   onUpdate: "CASCADE",
 });
 
-UserModel.hasOne(MessageModel, {
-  foreignKey: "senderId",
-  onDelete: "CASCADE",
-  onUpdate: "CASCADE",
-});
-
-UserModel.hasOne(ParticipantModel, {
+UserModel.hasMany(ParticipantModel, {
   foreignKey: "userId",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
 });
 
-ConversationModel.hasOne(ParticipantModel, {
+ParticipantModel.belongsTo(UserModel, {
+  foreignKey: "userId",
+});
+
+ConversationModel.hasMany(ParticipantModel, {
   foreignKey: "conversationId",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
+});
+
+ParticipantModel.belongsTo(ConversationModel, {
+  foreignKey: "conversationId",
 });
 
 UserModel.hasOne(OtpModel, {

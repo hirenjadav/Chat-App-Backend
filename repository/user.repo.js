@@ -9,7 +9,15 @@ const passwordEncrytSalt = 10;
 
 const fetchUsers = async (filterOption = {}) => {
   try {
-    const userList = await User.findAll({ where: filterOption });
+    const filterCondition = {};
+    if (filterOption.search) {
+      filterCondition[Op.or] = [
+        { firstName: { [Op.substring]: filterOption.search } },
+        { lastName: { [Op.substring]: filterOption.search } },
+        { email: { [Op.substring]: filterOption.search } },
+      ];
+    }
+    const userList = await User.findAll({ where: filterCondition });
     return userList.map((x) => mapUserDetails(x));
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
@@ -130,6 +138,7 @@ const mapUserDetails = (data) => {
     isActive: data["isActive"],
     firstName: data["firstName"],
     lastName: data["lastName"],
+    fullName: data["firstName"] + " " + data["lastName"],
     email: data["email"],
     phoneCountryCode: data["phoneCountryCode"],
     phoneNumber: data["phoneNumber"],

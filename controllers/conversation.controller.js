@@ -28,11 +28,26 @@ exports.fetchConversations = async (req, res, next) => {
   }
 };
 
+exports.fetchConversationList = async (req, res, next) => {
+  console.log("\n\n===> fetchConversationList req.query", req.query);
+
+  if (!req.query.userId) throw new HTTP400Error();
+
+  try {
+    const conversationList =
+      await conversationRespository.fetchConversationList(req.query.userId);
+
+    responseHandler.sendSuccessResponse(res, conversationList);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.createConversation = async (req, res, next) => {
   console.log("\n\n===> createConversation req.body", req.body);
 
   if (
-    !req.body.userId ||
+    !req.query.userId ||
     !req.body.conversationType ||
     !req.body.participantIds
   )
@@ -40,7 +55,7 @@ exports.createConversation = async (req, res, next) => {
 
   try {
     const newConversation = await conversationRespository.createConversation(
-      req.body.userId,
+      req.query.userId,
       req.body.conversationType,
       req.body.participantIds
     );

@@ -15,7 +15,11 @@ const fetchMessages = async (filterOption) => {
 
 const createMessage = async (data) => {
   try {
-    const messageData = { messageType: data.messageType };
+    const messageData = {
+      senderId: data.senderId,
+      messageType: data.messageType,
+      conversationId: data.conversationId,
+    };
 
     if (data.message) messageData["message"] = data.message;
     if (data.messageAttachment)
