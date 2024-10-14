@@ -40,6 +40,7 @@ const User = db.define("user", {
     allowNull: false,
     defaultValue: false,
   },
+  profilePicture: DataTypes.STRING,
   deletedAt: DataTypes.DATE,
 });
 

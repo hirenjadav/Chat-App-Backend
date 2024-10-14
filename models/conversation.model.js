@@ -14,6 +14,7 @@ const Conversation = db.define("conversation", {
     allowNull: false,
   },
   name: DataTypes.STRING,
+  profilePicture: DataTypes.STRING,
 });
 
 module.exports = Conversation;

@@ -17,6 +17,8 @@ const fetchUsers = async (filterOption = {}) => {
         { email: { [Op.substring]: filterOption.search } },
       ];
     }
+    if (filterOption.id) filterCondition["id"] = filterOption.id;
+
     const userList = await User.findAll({ where: filterCondition });
     return userList.map((x) => mapUserDetails(x));
   } catch (error) {
@@ -142,6 +144,7 @@ const mapUserDetails = (data) => {
     email: data["email"],
     phoneCountryCode: data["phoneCountryCode"],
     phoneNumber: data["phoneNumber"],
+    profilePicture: data["profilePicture"] ? data["profilePicture"] : null,
   };
 };
 

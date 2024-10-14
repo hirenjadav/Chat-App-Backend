@@ -2,6 +2,7 @@ const ERROR_CODES = require("../constants/errorCodes.constant");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 const Participant = require("../models/participant.model");
 const BaseError = require("../utils/BaseError");
+const userRepository = require("./user.repo");
 
 const fetchParticipants = async (conversationId) => {
   try {
@@ -9,7 +10,11 @@ const fetchParticipants = async (conversationId) => {
       where: { conversationId },
     });
 
-    return participantList; // Return the list of participants
+    const mappedParticipantList = await Promise.all(
+      participantList.map(async (participant) => mapParticipant(participant))
+    );
+
+    return mappedParticipantList; // Return the list of participants
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;
@@ -83,6 +88,23 @@ const deleteParticipant = async (participantId) => {
     // Handle or log the error, then re-throw it if necessary
     throw error;
   }
+};
+
+const mapParticipant = async (p) => {
+  const participantDetails = await userRepository.fetchUsers({
+    id: p.userId,
+  });
+  return {
+    id: p.id,
+    participantType: p.userType,
+    userId: participantDetails[0].id,
+    fullName: participantDetails[0].fullName,
+    firstName: participantDetails[0].firstName,
+    lastName: participantDetails[0].lastName,
+    email: participantDetails[0].email,
+    phoneNumber: participantDetails[0].phoneNumber,
+    profilePicture: participantDetails[0].profilePicture,
+  };
 };
 
 const participantRespository = {

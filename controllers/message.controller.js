@@ -6,11 +6,10 @@ const HTTP400Error = require("../utils/Http400Error");
 exports.fetchMessages = async (req, res, next) => {
   console.log("\n\n===> fetchMessages req.query", req.query);
 
-  if (!req.query.userId || !req.query.conversationId) throw new HTTP400Error();
+  if (!req.query.conversationId) throw new HTTP400Error();
 
   try {
     const filterOption = {
-      senderId: req.query.userId,
       conversationId: req.query.conversationId,
     };
 

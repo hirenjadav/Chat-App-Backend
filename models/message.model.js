@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database.config");
+const MESSAGE_TYPES = require("../constants/messageType.constant");
 
 const Message = db.define("message", {
   id: {
@@ -13,15 +14,9 @@ const Message = db.define("message", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  isMessageSent: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  },
-  isMessageViewed: {
-    type: DataTypes.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
+  messageStatus: {
+    type: DataTypes.STRING,
+    defaultValue: MESSAGE_TYPES.PENDING,
   },
   message: DataTypes.STRING,
   messageAttachment: DataTypes.STRING,

@@ -34,8 +34,14 @@ exports.fetchConversationList = async (req, res, next) => {
   if (!req.query.userId) throw new HTTP400Error();
 
   try {
+    const filterOption = {};
+    if (req.query.conversationId) filterOption["id"] = req.query.conversationId;
+
     const conversationList =
-      await conversationRespository.fetchConversationList(req.query.userId);
+      await conversationRespository.fetchConversationList(
+        req.query.userId,
+        filterOption
+      );
 
     responseHandler.sendSuccessResponse(res, conversationList);
   } catch (error) {

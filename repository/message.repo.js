@@ -16,6 +16,20 @@ const fetchMessages = async (filterOption) => {
   }
 };
 
+const fetchLatestMessage = async (conversationId) => {
+  try {
+    const message = await Message.findOne({
+      where: { conversationId },
+      order: [["createdAt", "DESC"]],
+      limit: 1,
+    });
+    return message; // Return the fetched messages
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
+};
+
 const createMessage = async (data) => {
   try {
     const messageData = {
@@ -83,6 +97,7 @@ const deleteMessage = async (messageId) => {
 
 const messageRespository = {
   fetchMessages,
+  fetchLatestMessage,
   createMessage,
   updateMessage,
   deleteMessage,

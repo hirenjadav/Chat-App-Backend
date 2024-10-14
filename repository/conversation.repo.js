@@ -3,11 +3,12 @@ const participantRespository = require("./participant.repo");
 const Participant = require("../models/participant.model");
 const User = require("../models/user.model");
 const Message = require("../models/message.model");
+const messageRespository = require("./message.repo");
 
 const fetchConversations = async (filterOption) => {
   try {
     const conversationList = await Conversation.findAll({
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "type", "profilePicture"],
       where: filterOption,
       include: [
         {
@@ -38,11 +39,12 @@ const fetchConversations = async (filterOption) => {
 const fetchConversationList = async (userId, filterOption = {}) => {
   try {
     const conversationList = await Conversation.findAll({
-      attributes: ["id", "name", "type"],
+      attributes: ["id", "name", "type", "profilePicture"],
       where: filterOption,
       include: [
         {
           model: Participant,
+          where: { userId },
           attributes: ["id", "userType", "userId"],
           include: [
             {
@@ -51,15 +53,12 @@ const fetchConversationList = async (userId, filterOption = {}) => {
             },
           ],
         },
-        {
-          model: Message,
-          order: [["createdAt", "DESC"]],
-          limit: 1,
-        },
       ],
     });
 
-    return mapConversationList(userId, conversationList); // Return the fetched conversations
+    const mappedConversationList = await mapConversationList(conversationList);
+
+    return mappedConversationList; // Return the fetched conversations
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;
@@ -69,7 +68,7 @@ const fetchConversationList = async (userId, filterOption = {}) => {
 const createConversation = async (userId, conversationType, participantIds) => {
   try {
     const existingConversation = await Conversation.findAll({
-      attributes: ["id", "name"],
+      attributes: ["id", "name", "type", "profilePicture"],
       where: { type: conversationType },
       include: [
         {
@@ -131,40 +130,25 @@ const deleteConversation = async (userId, conversationId) => {
   }
 };
 
-const mapConversationList = (userId, list) => {
-  return list.map((chat) => {
-    chat = chat.dataValues;
+const mapConversationList = async (list) => {
+  return Promise.all(
+    list.map(async (chat) => {
+      const latestMessage = await messageRespository.fetchLatestMessage(
+        chat.id
+      );
+      const participants = await participantRespository.fetchParticipants(
+        chat.id
+      );
 
-    const participants = chat.participants
-      .filter((p) => p.userId != userId)
-      .map((p) => ({
-        participantId: p.id,
-        participantType: p.userType,
-        userId: p.userId,
-        firstName: p.user.firstName,
-        lastName: p.user.lastName,
-        email: p.user.email,
-        phoneNumber: p.user.phoneNumber,
-      }));
-    const creatorDetails =
-      chat.participants
-        .filter((p) => p.userId == userId)
-        .map((p) => ({
-          participantId: p.id,
-          participantType: p.userType,
-          userId: p.userId,
-          firstName: p.user.firstName,
-          lastName: p.user.lastName,
-          email: p.user.email,
-          phoneNumber: p.user.phoneNumber,
-        }))[0] || null;
-
-    return {
-      ...chat,
-      participants,
-      creatorDetails,
-    };
-  });
+      return {
+        id: chat.id,
+        name: chat.name,
+        type: chat.type,
+        participants,
+        latestMessage,
+      };
+    })
+  );
 };
 
 const conversationRespository = {
