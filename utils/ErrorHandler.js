@@ -1,6 +1,7 @@
 const errorCodeDescription = require("../constants/errorCodeMessage.constant");
 const ERROR_CODES = require("../constants/errorCodes.constant");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
+const logger = require("../services/logger.service");
 const BaseError = require("./BaseError");
 
 class ErrorHandler {
@@ -24,11 +25,11 @@ class ErrorHandler {
   }
 
   handleApiError(error, response) {
-    console.error("\n\n\n");
-    console.error("Server Api Error at ", new Date().toUTCString());
-    console.error("Server Api Error name: ", error.name);
-    console.error("Server Api Error message: ", error.message);
-    if (error.stack) console.error("Server Api Error stack:\n", error.stack);
+    logger.error("\n\n\n");
+    logger.error("Server Api Error at ", new Date().toUTCString());
+    logger.error("Server Api Error name: ", error.name);
+    logger.error("Server Api Error message: ", error.message);
+    if (error.stack) logger.error("Server Api Error stack:\n", error.stack);
 
     const errorResponse = {
       status: "failure",

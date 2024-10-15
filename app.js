@@ -30,6 +30,7 @@ const messageRoute = require("./routes/message.route");
 const participantRoute = require("./routes/participant.route");
 const friendRoute = require("./routes/friend.route");
 const errorHandler = require("./utils/ErrorHandler");
+const logger = require("./services/logger.service");
 app.use("/auth", authRoute);
 app.use("/user", verfiyUserToken, userRoute);
 app.use("/conv", verfiyUserToken, conversationRoute);
@@ -55,26 +56,26 @@ io.on("connection", socketConnection);
 // Check database connection
 db.authenticate()
   .then(() => {
-    console.log("Connection has been established successfully.");
+    logger.log("Connection has been established successfully.");
 
     const serverPort = process.env.PORT || 3000;
     app.listen(serverPort);
-    console.log("Server listening on port " + serverPort + ".");
+    logger.log("Server listening on port " + serverPort + ".");
 
     const webSocketServerPort = process.env.WEB_SOCKET_PORT || 4000;
     io.listen(webSocketServerPort);
-    console.log(
+    logger.log(
       "Web Socket Server listening on port " + webSocketServerPort + "."
     );
   })
   .catch((error) => {
-    console.error("Unable to connect to the database:", error);
+    logger.error("Unable to connect to the database:", error);
   });
 
 db.sync({ alter: true })
   .then(() => {
-    console.log("Database sync established successfully.");
+    logger.log("Database sync established successfully.");
   })
   .catch((error) => {
-    console.error("Unable to sync the database:", error);
+    logger.error("Unable to sync the database:", error);
   });

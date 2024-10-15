@@ -3,9 +3,10 @@ const authRepository = require("../repository/auth.repo");
 const HTTP400Error = require("../utils/Http400Error");
 const jwt = require("jsonwebtoken");
 const userRepository = require("../repository/user.repo");
+const logger = require("../services/logger.service");
 
 exports.loginWithOtp = async (req, res, next) => {
-  console.log("\n\n===> loginWithOtp req.body", req.body);
+  logger.log("loginWithOtp req.body", req.body);
 
   if (!req.body.number) throw new HTTP400Error();
   try {
@@ -17,7 +18,7 @@ exports.loginWithOtp = async (req, res, next) => {
 };
 
 exports.signup = async (req, res, next) => {
-  console.log("\n\n===> signup req.body", req.body);
+  logger.log("signup req.body", req.body);
 
   try {
     if (
@@ -61,7 +62,7 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.loginWithPassword = async (req, res, next) => {
-  console.log("\n\n===> loginWithPassword req.body", req.body);
+  logger.log("loginWithPassword req.body", req.body);
 
   if (!req.body.email || !req.body.password) throw new HTTP400Error();
 
@@ -91,7 +92,7 @@ exports.loginWithPassword = async (req, res, next) => {
 };
 
 exports.otpVerify = async (req, res, next) => {
-  console.log("\n\n===> otpVerify req.body", req.body);
+  logger.log("otpVerify req.body", req.body);
 
   if (!req.body.number || !req.body.otp) throw new HTTP400Error();
 

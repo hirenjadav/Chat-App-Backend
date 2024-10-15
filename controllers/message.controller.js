@@ -1,10 +1,11 @@
 const messageRespository = require("../repository/message.repo");
 const errorHandler = require("../services/errorHandler.service");
+const logger = require("../services/logger.service");
 const responseHandler = require("../services/responseHandler.service");
 const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchMessages = async (req, res, next) => {
-  console.log("\n\n===> fetchMessages req.query", req.query);
+  logger.log("fetchMessages req.query", req.query);
 
   if (!req.query.conversationId) throw new HTTP400Error();
 
@@ -26,7 +27,7 @@ exports.fetchMessages = async (req, res, next) => {
 };
 
 exports.createMessage = async (req, res, next) => {
-  console.log("\n\n===> createMessage req.body", req.body);
+  logger.log("createMessage req.body", req.body);
 
   if (!req.body.conversationId || !req.body.messageType)
     throw new HTTP400Error();
@@ -49,7 +50,7 @@ exports.createMessage = async (req, res, next) => {
 };
 
 exports.updateMessage = async (req, res, next) => {
-  console.log("\n\n===> updateMessage req.body", req.body);
+  logger.log("updateMessage req.body", req.body);
 
   if (!req.body.messageId) throw new HTTP400Error();
 
@@ -60,13 +61,13 @@ exports.updateMessage = async (req, res, next) => {
     );
     responseHandler.sendSuccessResponse(res, updateMessage);
   } catch (error) {
-    console.log(error);
+    logger.log(error);
     errorHandler.throwServerError();
   }
 };
 
 exports.deleteMessage = async (req, res, next) => {
-  console.log("\n\n===> deleteMessage req.query", req.query);
+  logger.log("deleteMessage req.query", req.query);
 
   if (!req.query.messageId) throw new HTTP400Error();
 

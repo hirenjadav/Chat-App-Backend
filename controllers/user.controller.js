@@ -1,11 +1,12 @@
 const userRepository = require("../repository/user.repo");
 const errorHandler = require("../services/errorHandler.service");
+const logger = require("../services/logger.service");
 const responseHandler = require("../services/responseHandler.service");
 const APIError = require("../utils/ApiError");
 const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchUsers = async (req, res, next) => {
-  console.log("\n\n===> fetchUsers req.query", req.query);
+  logger.log("fetchUsers req.query", req.query);
 
   const filterOption = {};
   // if (req.query.userId) {
@@ -20,7 +21,7 @@ exports.fetchUsers = async (req, res, next) => {
 };
 
 exports.createUser = async (req, res, next) => {
-  console.log("\n\n===> createUser req.body", req.body);
+  logger.log("createUser req.body", req.body);
 
   try {
     if (
@@ -51,7 +52,7 @@ exports.createUser = async (req, res, next) => {
 };
 
 exports.updateUser = async (req, res, next) => {
-  console.log("\n\n===> updateUser req.body", req.body);
+  logger.log("updateUser req.body", req.body);
 
   if (!req.body.id) throw new HTTP400Error();
 
@@ -71,7 +72,7 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.deleteUser = async (req, res, next) => {
-  console.log("\n\n===> deleteUser req.query", req.query);
+  logger.log("deleteUser req.query", req.query);
 
   if (!req.query.userId) throw new HTTP400Error();
 

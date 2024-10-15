@@ -1,9 +1,10 @@
 const friendRepository = require("../repository/friend.repo");
+const logger = require("../services/logger.service");
 const responseHandler = require("../services/responseHandler.service");
 const HTTP400Error = require("../utils/Http400Error");
 
 exports.fetchFriends = async (req, res, next) => {
-  console.log("\n\n===> fetchFriends req.query", req.query);
+  logger.log("fetchFriends req.query", req.query);
 
   const filterOption = {};
   if (req.query.userId) {
@@ -15,7 +16,7 @@ exports.fetchFriends = async (req, res, next) => {
 };
 
 exports.createFriendship = async (req, res, next) => {
-  console.log("\n\n===> createFriendship req.body", req.body);
+  logger.log("createFriendship req.body", req.body);
 
   try {
     if (!req.body.userId1 || !req.body.userId2) throw new HTTP400Error();
@@ -33,7 +34,7 @@ exports.createFriendship = async (req, res, next) => {
 };
 
 exports.updateFriendship = async (req, res, next) => {
-  console.log("\n\n===> updateFriendship req.body", req.body);
+  logger.log("updateFriendship req.body", req.body);
 
   if (!req.body.userNickName1 || !req.body.userNickName2)
     throw new HTTP400Error();
@@ -54,7 +55,7 @@ exports.updateFriendship = async (req, res, next) => {
 };
 
 exports.deleteFriendship = async (req, res, next) => {
-  console.log("\n\n===> deleteFriendship req.query", req.query);
+  logger.log("deleteFriendship req.query", req.query);
 
   if (!req.query.id) throw new HTTP400Error();
 

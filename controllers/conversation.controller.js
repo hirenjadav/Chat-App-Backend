@@ -3,9 +3,10 @@ const responseHandler = require("../services/responseHandler.service");
 const conversationRespository = require("../repository/conversation.repo");
 const APIError = require("../utils/ApiError");
 const HTTP400Error = require("../utils/Http400Error");
+const logger = require("../services/logger.service");
 
 exports.fetchConversations = async (req, res, next) => {
-  console.log("\n\n===> fetchConversations req.query", req.query);
+  logger.log("fetchConversations req.query", req.query);
 
   if (!req.query.userId) throw new HTTP400Error();
 
@@ -29,7 +30,7 @@ exports.fetchConversations = async (req, res, next) => {
 };
 
 exports.fetchConversationList = async (req, res, next) => {
-  console.log("\n\n===> fetchConversationList req.query", req.query);
+  logger.log("fetchConversationList req.query", req.query);
 
   if (!req.query.userId) throw new HTTP400Error();
 
@@ -50,7 +51,7 @@ exports.fetchConversationList = async (req, res, next) => {
 };
 
 exports.createConversation = async (req, res, next) => {
-  console.log("\n\n===> createConversation req.body", req.body);
+  logger.log("createConversation req.body", req.body);
 
   if (
     !req.query.userId ||
@@ -73,7 +74,7 @@ exports.createConversation = async (req, res, next) => {
 };
 
 exports.deleteConversation = async (req, res, next) => {
-  console.log("\n\n===> deleteConversation req.query", req.query);
+  logger.log("deleteConversation req.query", req.query);
 
   if (!req.query.userId || !req.query.conversationId) throw new HTTP400Error();
 
