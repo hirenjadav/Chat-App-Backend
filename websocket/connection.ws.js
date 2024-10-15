@@ -1,11 +1,10 @@
 const logger = require("../services/logger.service");
+const messageWebsocketEventHandler = require("./messages.ws");
 
 const socketConnection = (socket) => {
   // socketConnectionCallbacks(socket);
 
-  socket.on("hello", (response) => {
-    logger.log("hello", response);
-  });
+  messageWebsocketEventHandler(socket);
 };
 
 const socketConnectionCallbacks = (socket) => {
