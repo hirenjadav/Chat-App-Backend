@@ -31,6 +31,11 @@ const messageWebsocketEventHandler = (socket) => {
       callback({ success: false, error: "Failed to save message" });
     }
   });
+
+  socket.on("disconnect", (conversationId) => {
+    logger.log(conversationId);
+    // if (conversationId) socket.leave(conversationId);
+  });
 };
 
 module.exports = messageWebsocketEventHandler;
