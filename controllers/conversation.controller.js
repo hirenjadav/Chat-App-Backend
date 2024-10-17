@@ -37,6 +37,8 @@ exports.fetchConversationList = async (req, res, next) => {
   try {
     const filterOption = {};
     if (req.query.conversationId) filterOption["id"] = req.query.conversationId;
+    if (req.query.conversationType)
+      filterOption["type"] = req.query.conversationType;
 
     const conversationList =
       await conversationRespository.fetchConversationList(
@@ -64,7 +66,8 @@ exports.createConversation = async (req, res, next) => {
     const newConversation = await conversationRespository.createConversation(
       req.query.userId,
       req.body.conversationType,
-      req.body.participantIds
+      req.body.participantIds,
+      req.body?.name
     );
 
     responseHandler.sendSuccessResponse(res, newConversation);

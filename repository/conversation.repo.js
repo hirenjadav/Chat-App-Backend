@@ -2,8 +2,9 @@ const Conversation = require("../models/conversation.model");
 const participantRespository = require("./participant.repo");
 const Participant = require("../models/participant.model");
 const User = require("../models/user.model");
-const Message = require("../models/message.model");
 const messageRespository = require("./message.repo");
+const { Sequelize } = require("../config/database.config");
+const CONVERSATION_TYPES = require("../constants/conversationType.constant");
 
 const fetchConversations = async (filterOption) => {
   try {
@@ -29,7 +30,7 @@ const fetchConversations = async (filterOption) => {
       ],
     });
 
-    return mapConversationList(userId, conversationList); // Return the fetched conversations
+    return mapConversationList(conversationList); // Return the fetched conversations
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;
@@ -65,41 +66,52 @@ const fetchConversationList = async (userId, filterOption = {}) => {
   }
 };
 
-const createConversation = async (userId, conversationType, participantIds) => {
+const createConversation = async (
+  userId,
+  conversationType,
+  participantIds,
+  conversationName
+) => {
   try {
-    const existingConversation = await Conversation.findAll({
-      attributes: ["id", "name", "type", "profilePicture"],
-      where: { type: conversationType },
-      include: [
-        {
-          model: Participant,
-          where: {
-            userId: [userId, ...participantIds],
-          },
-          include: [
-            {
-              model: User,
-              attributes: [
-                "id",
-                "firstName",
-                "lastName",
-                "email",
-                "phoneNumber",
-              ],
-            },
-          ],
-        },
-      ],
-    });
+    participantIds = [userId, ...participantIds];
 
-    if (existingConversation.length) return existingConversation[0];
+    if (conversationType == CONVERSATION_TYPES.PERSONAL) {
+      let conversationListUserIds = await Participant.findAll({
+        attributes: [
+          "conversationId",
+          [Sequelize.fn("GROUP_CONCAT", Sequelize.col("userId")), "userIds"],
+        ],
+        group: ["conversationId"],
+      });
+
+      const existingConversations = conversationListUserIds
+        .map((x) => {
+          x = x.dataValues;
+          return {
+            ...x,
+            userIds: x.userIds.split(","),
+          };
+        })
+        .filter((x) => {
+          if (x.userIds.length != participantIds.length) return false;
+          return participantIds.every((p) => x.userIds.includes(p));
+        });
+
+      if (existingConversations.length) {
+        const existingConversation = await Conversation.findOne({
+          where: {
+            id: existingConversations[0]["conversationId"],
+          },
+        });
+        return existingConversation;
+      }
+    }
 
     const newConversation = await Conversation.create({
       creatorId: userId,
       type: conversationType,
+      name: conversationName ? conversationName : null,
     });
-
-    participantIds = [userId, ...participantIds];
 
     // Add participants in bulk
     const participants = await participantRespository.createBulkParticipants(
