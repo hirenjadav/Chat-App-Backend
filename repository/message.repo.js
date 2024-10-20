@@ -2,6 +2,7 @@ const ERROR_CODES = require("../constants/errorCodes.constant");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
 const Message = require("../models/message.model");
 const BaseError = require("../utils/BaseError");
+const messageStatusRespository = require("./messageStatus.repo");
 
 const fetchMessages = async (filterOption) => {
   try {
@@ -46,6 +47,11 @@ const createMessage = async (data) => {
 
     const newMessage = Message.build(messageData);
     await newMessage.save();
+
+    await messageStatusRespository.createMessageStatus(
+      newMessage.id,
+      newMessage.conversationId
+    );
 
     return newMessage; // Return the newly created message
   } catch (error) {

@@ -1,7 +1,8 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/database.config");
+const MESSAGE_STATUS_TYPES = require("../constants/messageStatusType.constant");
 
-const Participant = db.define("participant", {
+const MessageStatus = db.define("messageStatus", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
@@ -9,14 +10,10 @@ const Participant = db.define("participant", {
     primaryKey: true,
     unique: true,
   },
-  userType: {
+  status: {
     type: DataTypes.STRING,
-    allowNull: false,
-  },
-  unseenMessageCount: {
-    type: DataTypes.BIGINT,
-    defaultValue: 0,
+    defaultValue: MESSAGE_STATUS_TYPES.PENDING,
   },
 });
 
-module.exports = Participant;
+module.exports = MessageStatus;

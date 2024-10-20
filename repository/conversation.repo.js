@@ -46,7 +46,13 @@ const fetchConversationList = async (userId, filterOption = {}) => {
         {
           model: Participant,
           where: { userId },
-          attributes: ["id", "userType", "userId"],
+          attributes: [
+            "id",
+            "userType",
+            "userId",
+            "lastSeenMessageId",
+            "unseenMessageCount",
+          ],
           include: [
             {
               model: User,

@@ -104,6 +104,8 @@ const mapParticipant = async (p) => {
     email: participantDetails[0].email,
     phoneNumber: participantDetails[0].phoneNumber,
     profilePicture: participantDetails[0].profilePicture,
+    lastSeenMessageId: p.lastSeenMessageId,
+    unseenMessageCount: p.unseenMessageCount,
   };
 };
 

@@ -4,6 +4,7 @@ const ParticipantModel = require("./participant.model");
 const MessageModel = require("./message.model");
 const OtpModel = require("./otp.model");
 const FriendModel = require("./friend.model");
+const MessageStatusModel = require("./messageStatus.model");
 
 ConversationModel.hasMany(MessageModel, {
   foreignKey: "conversationId",
@@ -59,6 +60,32 @@ UserModel.hasOne(FriendModel, {
   foreignKey: "userId2",
   onDelete: "CASCADE",
   onUpdate: "CASCADE",
+});
+
+MessageModel.hasOne(ParticipantModel, {
+  foreignKey: "lastSeenMessageId",
+  onDelete: "SET NULL",
+  onUpdate: "SET NULL",
+});
+
+ParticipantModel.hasMany(MessageStatusModel, {
+  foreignKey: "participantId",
+  onDelete: "SET NULL",
+  onUpdate: "SET NULL",
+});
+
+MessageStatusModel.belongsTo(ParticipantModel, {
+  foreignKey: "participantId",
+});
+
+MessageModel.hasMany(MessageStatusModel, {
+  foreignKey: "messageId",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+MessageStatusModel.belongsTo(MessageModel, {
+  foreignKey: "messageId",
 });
 
 module.exports = {
