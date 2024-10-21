@@ -19,9 +19,10 @@ const fetchMessageStatus = async (filterOption) => {
 
 const createMessageStatus = async (messageId, conversationId) => {
   try {
-    const participantList = await participantRespository.fetchParticipants(
-      conversationId
-    );
+    const participantList =
+      await participantRespository.fetchParticipantsByConversationId(
+        conversationId
+      );
 
     const list = participantList.map((x) => {
       return {

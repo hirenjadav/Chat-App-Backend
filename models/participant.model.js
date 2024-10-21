@@ -13,10 +13,6 @@ const Participant = db.define("participant", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  unseenMessageCount: {
-    type: DataTypes.BIGINT,
-    defaultValue: 0,
-  },
 });
 
 module.exports = Participant;

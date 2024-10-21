@@ -4,7 +4,24 @@ const Participant = require("../models/participant.model");
 const BaseError = require("../utils/BaseError");
 const userRepository = require("./user.repo");
 
-const fetchParticipants = async (conversationId) => {
+const fetchParticipants = async (filterOptions = {}) => {
+  try {
+    const participantList = await Participant.findAll({
+      where: filterOptions,
+    });
+
+    const mappedParticipantList = await Promise.all(
+      participantList.map(async (participant) => mapParticipant(participant))
+    );
+
+    return mappedParticipantList; // Return the list of participants
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
+};
+
+const fetchParticipantsByConversationId = async (conversationId) => {
   try {
     const participantList = await Participant.findAll({
       where: { conversationId },
@@ -111,6 +128,7 @@ const mapParticipant = async (p) => {
 
 const participantRespository = {
   fetchParticipants,
+  fetchParticipantsByConversationId,
   createParticipant,
   createBulkParticipants,
   updateParticipant,

@@ -1,13 +1,8 @@
 const WS_MESSAGE_EVENTS = require("../constants/websocketEvent.contant");
 const messageRespository = require("../repository/message.repo");
-const logger = require("../services/logger.service");
+const messageStatusController = require("../controllers/messageStatus.controller");
 
 const messageWebsocketEventHandler = (socket) => {
-  socket.on(WS_MESSAGE_EVENTS.JOIN_CONVERSATION, (conversationId) => {
-    if (conversationId) socket.join(conversationId);
-    logger.info(`user connected to room: ${conversationId}`);
-  });
-
   socket.on(WS_MESSAGE_EVENTS.SEND_MESSAGE, async (newMessage, callback) => {
     if (
       !newMessage.conversationId ||
@@ -61,9 +56,10 @@ const messageWebsocketEventHandler = (socket) => {
     }
   });
 
-  socket.on(WS_MESSAGE_EVENTS.LEAVE_CONVERSATION, (conversationId) => {
-    if (conversationId) socket.leave(conversationId);
-    logger.info(`user left room: ${conversationId}`);
+  socket.on(WS_MESSAGE_EVENTS.UPDATE_MESSAGE_STATUS, async (data, callback) => {
+    try {
+      await messageStatusController.updateMultipleSingleUserMessageStatus(data);
+    } catch (error) {}
   });
 };
 

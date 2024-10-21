@@ -5,6 +5,8 @@ const User = require("../models/user.model");
 const messageRespository = require("./message.repo");
 const { Sequelize } = require("../config/database.config");
 const CONVERSATION_TYPES = require("../constants/conversationType.constant");
+const MessageStatus = require("../models/messageStatus.model");
+const MESSAGE_STATUS_TYPES = require("../constants/messageStatusType.constant");
 
 const fetchConversations = async (filterOption) => {
   try {
@@ -46,17 +48,14 @@ const fetchConversationList = async (userId, filterOption = {}) => {
         {
           model: Participant,
           where: { userId },
-          attributes: [
-            "id",
-            "userType",
-            "userId",
-            "lastSeenMessageId",
-            "unseenMessageCount",
-          ],
+          attributes: ["id", "userType", "userId"],
           include: [
             {
               model: User,
               attributes: ["firstName", "lastName", "email", "phoneNumber"],
+            },
+            {
+              model: MessageStatus,
             },
           ],
         },
@@ -154,9 +153,12 @@ const mapConversationList = async (list) => {
       const latestMessage = await messageRespository.fetchLatestMessage(
         chat.id
       );
-      const participants = await participantRespository.fetchParticipants(
-        chat.id
-      );
+      const participants =
+        await participantRespository.fetchParticipantsByConversationId(chat.id);
+
+      const unseenMessageCount = chat.participants[0].messageStatuses.filter(
+        (x) => x.status != MESSAGE_STATUS_TYPES.SEEN
+      ).length;
 
       return {
         id: chat.id,
@@ -164,6 +166,7 @@ const mapConversationList = async (list) => {
         type: chat.type,
         participants,
         latestMessage,
+        unseenMessageCount,
       };
     })
   );
