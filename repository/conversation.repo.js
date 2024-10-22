@@ -41,30 +41,10 @@ const fetchConversations = async (filterOption) => {
 
 const fetchConversationList = async (userId, filterOption = {}) => {
   try {
-    const conversationList = await Conversation.findAll({
-      attributes: ["id", "name", "type", "profilePicture"],
-      where: filterOption,
-      include: [
-        {
-          model: Participant,
-          where: { userId },
-          attributes: ["id", "userType", "userId"],
-          include: [
-            {
-              model: User,
-              attributes: ["firstName", "lastName", "email", "phoneNumber"],
-            },
-            {
-              model: MessageStatus,
-            },
-          ],
-        },
-      ],
-    });
-
+    const user = await User.findOne({ where: { id: userId } });
+    const conversationList = await user.getConversations();
     const mappedConversationList = await mapConversationList(conversationList);
-
-    return mappedConversationList; // Return the fetched conversations
+    return mappedConversationList;
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
     throw error;
@@ -118,10 +98,10 @@ const createConversation = async (
       name: conversationName ? conversationName : null,
     });
 
-    // Add participants in bulk
-    const participants = await participantRespository.createBulkParticipants(
-      newConversation.id,
-      participantIds
+    await Promise.all(
+      participantIds.map(async (id) => {
+        await newConversation.setUsers(id);
+      })
     );
 
     return newConversation; // Return the newly created conversation
@@ -150,15 +130,12 @@ const deleteConversation = async (userId, conversationId) => {
 const mapConversationList = async (list) => {
   return Promise.all(
     list.map(async (chat) => {
-      const latestMessage = await messageRespository.fetchLatestMessage(
-        chat.id
-      );
-      const participants =
-        await participantRespository.fetchParticipantsByConversationId(chat.id);
+      const latestMessage = await chat.getMessages();
+      const participants = await chat.getUsers();
 
-      const unseenMessageCount = chat.participants[0].messageStatuses.filter(
-        (x) => x.status != MESSAGE_STATUS_TYPES.SEEN
-      ).length;
+      // const unseenMessageCount = chat.participants[0].messageStatuses.filter(
+      //   (x) => x.status != MESSAGE_STATUS_TYPES.SEEN
+      // ).length;
 
       return {
         id: chat.id,
@@ -166,7 +143,7 @@ const mapConversationList = async (list) => {
         type: chat.type,
         participants,
         latestMessage,
-        unseenMessageCount,
+        // unseenMessageCount,
       };
     })
   );

@@ -9,10 +9,6 @@ const Participant = db.define("participant", {
     primaryKey: true,
     unique: true,
   },
-  userType: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 });
 
 module.exports = Participant;

@@ -7,6 +7,6 @@ module.exports = new Sequelize(
   {
     host: process.env.DATABASE_HOST,
     dialect: process.env.DATABASE_AGENT,
-    // logging: false,
+    logging: false,
   }
 );
