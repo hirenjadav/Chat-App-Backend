@@ -154,6 +154,7 @@ const userRepository = {
   updateUser,
   deleteUser,
   passwordVerify,
+  mapUserDetails,
 };
 
 module.exports = userRepository;

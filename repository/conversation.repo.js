@@ -7,6 +7,8 @@ const { Sequelize } = require("../config/database.config");
 const CONVERSATION_TYPES = require("../constants/conversationType.constant");
 const MessageStatus = require("../models/messageStatus.model");
 const MESSAGE_STATUS_TYPES = require("../constants/messageStatusType.constant");
+const { mapUserDetails } = require("./user.repo");
+const { Op } = require("sequelize");
 
 const fetchConversations = async (filterOption) => {
   try {
@@ -41,9 +43,20 @@ const fetchConversations = async (filterOption) => {
 
 const fetchConversationList = async (userId, filterOption = {}) => {
   try {
-    const user = await User.findOne({ where: { id: userId } });
-    const conversationList = await user.getConversations();
-    const mappedConversationList = await mapConversationList(conversationList);
+    const user = await User.findOne({
+      where: { id: userId },
+      include: {
+        model: Conversation,
+        where: filterOption,
+      },
+    });
+
+    if (!user) return [];
+
+    const mappedConversationList = await mapConversationList(
+      user.conversations,
+      user.id
+    );
     return mappedConversationList;
   } catch (error) {
     // Handle or log the error, then re-throw it if necessary
@@ -127,15 +140,33 @@ const deleteConversation = async (userId, conversationId) => {
   }
 };
 
-const mapConversationList = async (list) => {
+const mapConversationList = async (list, userId = null) => {
   return Promise.all(
     list.map(async (chat) => {
-      const latestMessage = await chat.getMessages();
-      const participants = await chat.getUsers();
+      const latestMessage = await messageRespository.fetchLatestMessage(
+        chat.id
+      );
+      const participantUsers = await chat.getUsers();
 
-      // const unseenMessageCount = chat.participants[0].messageStatuses.filter(
-      //   (x) => x.status != MESSAGE_STATUS_TYPES.SEEN
-      // ).length;
+      const participants = participantUsers.map((x) => ({
+        ...mapUserDetails(x),
+        lastSeenMessageTime: x.participant.lastSeenMessageTime,
+      }));
+
+      const unseenMessageCount = await MessageStatus.count({
+        where: {
+          [Op.not]: {
+            status: MESSAGE_STATUS_TYPES.SEEN,
+          },
+        },
+        include: {
+          model: Participant,
+          where: {
+            conversationId: chat.id,
+            userId: userId,
+          },
+        },
+      });
 
       return {
         id: chat.id,
@@ -143,7 +174,7 @@ const mapConversationList = async (list) => {
         type: chat.type,
         participants,
         latestMessage,
-        // unseenMessageCount,
+        unseenMessageCount,
       };
     })
   );

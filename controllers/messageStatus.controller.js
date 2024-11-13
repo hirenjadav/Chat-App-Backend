@@ -1,5 +1,6 @@
 const ERROR_CODES = require("../constants/errorCodes.constant");
 const HTTP_STATUS_CODE = require("../constants/httpStatusCode.constant");
+const Participant = require("../models/participant.model");
 const messageStatusRespository = require("../repository/messageStatus.repo");
 const participantRespository = require("../repository/participant.repo");
 const errorHandler = require("../services/errorHandler.service");
@@ -39,6 +40,11 @@ exports.updateMultipleSingleUserMessageStatus = async (data) => {
           x,
           participants[0].id,
           data.status
+        );
+
+        participantRespository.updateParticipantLastSeenMessage(
+          participants[0].id,
+          new Date()
         );
       })
     );

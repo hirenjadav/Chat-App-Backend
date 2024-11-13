@@ -9,6 +9,10 @@ const Participant = db.define("participant", {
     primaryKey: true,
     unique: true,
   },
+  lastSeenMessageTime: {
+    type: DataTypes.DATE,
+    defaultValue: new Date(),
+  },
 });
 
 module.exports = Participant;

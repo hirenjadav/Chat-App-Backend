@@ -107,6 +107,20 @@ const deleteParticipant = async (participantId) => {
   }
 };
 
+const updateParticipantLastSeenMessage = async (id, time) => {
+  try {
+    const participant = await Participant.findOne({
+      where: { id },
+    });
+    participant.lastSeenMessageTime = time;
+    participant.save();
+    return id; // Return the participant ID for confirmation
+  } catch (error) {
+    // Handle or log the error, then re-throw it if necessary
+    throw error;
+  }
+};
+
 const mapParticipant = async (p) => {
   const participantDetails = await userRepository.fetchUsers({
     id: p.userId,
@@ -133,6 +147,7 @@ const participantRespository = {
   createBulkParticipants,
   updateParticipant,
   deleteParticipant,
+  updateParticipantLastSeenMessage,
 };
 
 module.exports = participantRespository;
